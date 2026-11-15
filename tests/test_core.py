@@ -1,6 +1,6 @@
 import unittest
 
-from plugins.mi_mai.core import (
+from core import (
     DEFAULT_SETTINGS,
     device_is_allowed,
     extract_user_identity,
