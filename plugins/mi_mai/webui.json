@@ -1,0 +1,194 @@
+{
+  "schema_version": 2,
+  "required_capabilities": [
+    "custom_pages"
+  ],
+  "pages": [
+    {
+      "id": "mi-mai",
+      "title": "Mi Mai",
+      "mode": "custom",
+      "entry": "webui/index.html",
+      "layout": "document",
+      "queries": {
+        "dashboard": {
+          "api": "dashboard",
+          "version": "1",
+          "parameters": {}
+        }
+      },
+      "actions": {
+        "start_login": {
+          "api": "start_login",
+          "version": "1",
+          "parameters": {}
+        },
+        "refresh_devices": {
+          "api": "refresh_devices",
+          "version": "1",
+          "parameters": {}
+        },
+        "save_device": {
+          "api": "save_device",
+          "version": "1",
+          "parameters": {
+            "did": {
+              "type": "string",
+              "required": true
+            },
+            "alias": {
+              "type": "string",
+              "required": true
+            },
+            "category": {
+              "type": "string",
+              "required": true
+            },
+            "allowed": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        },
+        "set_scene_allowed": {
+          "api": "set_scene_allowed",
+          "version": "1",
+          "parameters": {
+            "key": {
+              "type": "string",
+              "required": true
+            },
+            "allowed": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        },
+        "set_controls": {
+          "api": "set_controls",
+          "version": "1",
+          "parameters": {
+            "device_enabled": {
+              "type": "boolean",
+              "required": true
+            },
+            "scene_enabled": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        },
+        "enable_controls": {
+          "api": "set_controls",
+          "version": "1",
+          "confirmation": "开启自然语言控制后，MaiBot 可能依据对话内容真实改变米家设备状态或启动场景。请只对可信用户开放，并仅添加你愿意授权的设备和场景。确认继续？",
+          "parameters": {
+            "device_enabled": {
+              "type": "boolean",
+              "required": true
+            },
+            "scene_enabled": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        },
+        "set_privacy": {
+          "api": "set_privacy",
+          "version": "1",
+          "parameters": {
+            "only_whitelisted_users": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        },
+        "set_maiweave": {
+          "api": "set_maiweave",
+          "version": "1",
+          "parameters": {
+            "enabled": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        },
+        "add_user": {
+          "api": "add_user",
+          "version": "1",
+          "parameters": {
+            "identity": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "remove_user": {
+          "api": "remove_user",
+          "version": "1",
+          "parameters": {
+            "identity": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "control_property": {
+          "api": "control_property",
+          "version": "1",
+          "confirmation": "确认向该米家设备发送此属性变更？设备可能立即动作。",
+          "parameters": {
+            "did": {
+              "type": "string",
+              "required": true
+            },
+            "property_name": {
+              "type": "string",
+              "required": true
+            },
+            "value": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "run_device_action": {
+          "api": "run_device_action",
+          "version": "1",
+          "confirmation": "确认执行此设备动作？设备可能立即运行或改变状态。",
+          "parameters": {
+            "did": {
+              "type": "string",
+              "required": true
+            },
+            "action_name": {
+              "type": "string",
+              "required": true
+            },
+            "arguments": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "run_scene": {
+          "api": "run_scene",
+          "version": "1",
+          "confirmation": "确认启动此米家场景？场景可能同时控制多个设备。",
+          "parameters": {
+            "key": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "logout": {
+          "api": "logout",
+          "version": "1",
+          "confirmation": "退出后需要重新扫描二维码登录。确认退出米家账号？",
+          "parameters": {}
+        }
+      }
+    }
+  ]
+}

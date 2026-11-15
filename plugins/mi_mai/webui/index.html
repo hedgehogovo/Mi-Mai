@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Mi Mai</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-size: 14px;
+        --ink: var(--maibot-foreground, #222);
+        --muted: var(--maibot-muted, #6b7280);
+        --line: var(--maibot-border, #d8dde5);
+        --surface: var(--maibot-surface, #fff);
+        --soft: var(--maibot-background, #f7f8fa);
+        --accent: var(--maibot-primary, #2f7de1);
+        --danger: var(--maibot-danger, #b42318);
+        --radius: var(--maibot-radius, 6px);
+        --font: var(--maibot-font-body, "Microsoft YaHei", "Segoe UI", sans-serif);
+        --display: var(--maibot-font-display, var(--font));
+      }
+      * { box-sizing: border-box; }
+      body {
+        min-width: 320px;
+        margin: 0;
+        padding: 20px;
+        color: var(--ink);
+        background: var(--soft);
+        font: 14px/1.6 var(--font);
+      }
+      button, input, select { font: inherit; color: inherit; }
+      button { cursor: pointer; }
+      button:disabled { cursor: wait; opacity: .55; }
+      button:focus-visible, input:focus-visible, select:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .shell { max-width: 1080px; margin: 0 auto; }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+      .brand-mark {
+        display: block;
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        object-fit: cover;
+      }
+      h1 { margin: 0; font: 600 21px/1.3 var(--display); }
+      .subhead { margin-top: 3px; color: var(--muted); font-size: 12px; }
+      .top-actions { display: flex; gap: 8px; align-items: center; }
+      .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+      .status-line { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); }
+      .status-dot.online { background: #2f9e5b; }
+      .status-dot.pending { background: #ca8a04; }
+      main { display: grid; gap: 16px; }
+      section { min-width: 0; }
+      main > section { animation: panel-in 240ms ease-out both; }
+      @keyframes panel-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .maibot-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        padding: 18px;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      h2 { margin: 0; font: 600 17px/1.35 var(--display); }
+      h3 { margin: 0; font-size: 14px; font-weight: 650; }
+      .section-head p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+      .login-row, .toolbar, .form-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+      .login-row { justify-content: space-between; }
+      .qr-area { display: flex; align-items: center; gap: 14px; margin-top: 13px; }
+      .qr-area img {
+        width: 148px;
+        height: 148px;
+        padding: 5px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fff;
+        image-rendering: pixelated;
+      }
+      .qr-area img { animation: qr-in 180ms ease-out both; }
+      @keyframes qr-in {
+        from { opacity: 0; transform: scale(.96); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      .muted { color: var(--muted); }
+      .small { font-size: 12px; }
+      .notice { min-height: 20px; margin: 9px 0 0; color: var(--muted); }
+      .notice.error { color: var(--danger); }
+      .settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 26px; }
+      .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        min-height: 46px;
+        border-bottom: 1px solid var(--line);
+      }
+      .setting-label { display: flex; flex-direction: column; gap: 3px; }
+      .setting-label strong { font-weight: 550; }
+      .switch { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+      .switch-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 32px;
+        padding: 3px 0;
+        border: 0;
+        background: transparent;
+      }
+      .switch-track {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 22px;
+        flex: 0 0 38px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--line);
+        transition: background-color 160ms ease, border-color 160ms ease;
+      }
+      .switch-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--surface);
+        box-shadow: 0 1px 3px #16231a33;
+        transition: transform 160ms ease;
+      }
+      .switch-control[aria-checked="true"] .switch-track {
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+      .switch-control[aria-checked="true"] .switch-thumb { transform: translateX(16px); }
+      .switch-state { color: var(--muted); font-size: 12px; }
+      .switch-control[aria-checked="true"] .switch-state { color: var(--accent); }
+      .user-form { display: flex; gap: 8px; max-width: 540px; }
+      .user-form input { flex: 1; }
+      .user-list { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 11px; }
+      .user-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 3px 5px 3px 9px;
+        background: var(--surface);
+      }
+      .user-item button { min-height: 25px; padding: 2px 6px; }
+      .device-list, .scene-list { display: grid; gap: 10px; }
+      .device, .scene { min-width: 0; }
+      .device { padding: 14px; }
+      .device-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+      .device-name { min-width: 0; }
+      .device-name h3 { overflow-wrap: anywhere; }
+      .device-meta { margin-top: 4px; overflow-wrap: anywhere; color: var(--muted); font-size: 12px; }
+      .device-form {
+        display: grid;
+        grid-template-columns: minmax(140px, 1fr) minmax(130px, 190px) minmax(0, auto);
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .device-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+      .allow-state { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+      .allow-state.allowed { color: #2f9e5b; }
+      .state-line {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 16px;
+        margin-top: 11px;
+        padding: 9px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .state-item { color: var(--ink); font-size: 12px; overflow-wrap: anywhere; }
+      .action-hint { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+      .control-row {
+        display: grid;
+        grid-template-columns: minmax(130px, 1fr) minmax(110px, 200px) auto;
+        gap: 8px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .empty { padding: 18px 0; color: var(--muted); }
+      .status-overview {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 9px;
+      }
+      .status-item {
+        min-width: 0;
+        padding: 10px 11px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--soft);
+      }
+      .status-item strong,
+      .status-item span {
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      .status-item strong { font-size: 12px; font-weight: 600; }
+      .status-item span { margin-top: 3px; color: var(--muted); font-size: 12px; }
+      .status-item.success { border-color: color-mix(in srgb, #2f9e5b 45%, var(--line)); }
+      .status-item.success span { color: #2f9e5b; }
+      .status-item.warning { border-color: color-mix(in srgb, #ca8a04 55%, var(--line)); }
+      .status-item.warning span { color: #9a6700; }
+      .attention-list {
+        display: grid;
+        gap: 5px;
+        margin: 12px 0 0;
+        padding: 0;
+        color: var(--muted);
+        font-size: 12px;
+        list-style: none;
+      }
+      .attention-list li::before { content: "注意："; color: #ca8a04; font-weight: 650; }
+      .attention-list:empty { display: none; }
+      .allowlist-section { min-width: 0; }
+      .allowlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+        gap: 10px;
+      }
+      .allowlist-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+        aspect-ratio: 1 / 1;
+        min-height: 148px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        animation: card-in 220ms ease-out both;
+      }
+      .allowlist-card.device-card { border-top: 3px solid #2f9e5b; }
+      .allowlist-card.scene-card { border-top: 3px solid var(--accent); }
+      .allowlist-kind {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .allowlist-card h3 {
+        margin-top: 7px;
+        overflow-wrap: anywhere;
+      }
+      .allowlist-meta {
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .allowlist-actions {
+        display: grid;
+        gap: 5px;
+        margin-top: 10px;
+      }
+      .allowlist-actions .maibot-button {
+        width: 100%;
+        min-height: 30px;
+        padding: 4px 7px;
+        font-size: 11px;
+      }
+      .allowlist-empty {
+        grid-column: 1 / -1;
+        padding: 12px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .privacy-confirm {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: #16231a66;
+        animation: panel-in 160ms ease-out both;
+      }
+      .privacy-dialog {
+        width: min(460px, 100%);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 18px;
+        color: var(--ink);
+        background: var(--surface);
+        box-shadow: 0 12px 36px #16231a33;
+      }
+      .privacy-dialog h2 { font-size: 16px; }
+      .privacy-dialog p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+      .privacy-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .device {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        animation: card-in 220ms ease-out both;
+      }
+      .device.is-allowed { border-color: color-mix(in srgb, #2f9e5b 55%, var(--line)); }
+      .scene { animation: card-in 220ms ease-out both; }
+      @keyframes card-in {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .action-parameters {
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+      }
+      .action-parameter {
+        display: grid;
+        grid-template-columns: minmax(90px, 0.8fr) minmax(120px, 1.2fr);
+        align-items: center;
+        gap: 7px;
+      }
+      .action-parameter label {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .scene {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 13px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+      }
+      .scene-name { overflow-wrap: anywhere; font-weight: 550; }
+      .scene-sub { margin-top: 3px; color: var(--muted); font-size: 12px; }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        border-radius: 3px;
+        padding: 2px 7px;
+        color: var(--muted);
+        background: var(--soft);
+        font-size: 11px;
+      }
+      .badge.allowed { color: #2f9e5b; background: color-mix(in srgb, #2f9e5b 14%, var(--surface)); }
+      .maibot-input,
+      input,
+      select {
+        width: 100%;
+        min-width: 0;
+        min-height: 36px;
+        padding: 6px 9px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+      }
+      .maibot-button {
+        min-height: 36px;
+        padding: 7px 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+      }
+      .maibot-button:hover { border-color: var(--accent); }
+      .maibot-button-primary {
+        color: #fff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+      .maibot-button-primary:hover { filter: brightness(.94); }
+      .maibot-button-danger {
+        color: var(--danger);
+        border-color: color-mix(in srgb, var(--danger) 40%, var(--line));
+      }
+      .settings-fieldset {
+        min-width: 0;
+        margin: 0;
+        padding: 8px 14px 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+      }
+      .settings-fieldset legend {
+        padding: 0 7px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      #toast {
+        position: fixed;
+        left: 50%;
+        bottom: 18px;
+        z-index: 10;
+        max-width: min(520px, calc(100vw - 24px));
+        transform: translateX(-50%);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        color: white;
+        background: var(--ink);
+        box-shadow: 0 4px 16px #16231a33;
+      }
+      #toast[hidden], [hidden] { display: none !important; }
+      @media (max-width: 620px) {
+        body { padding: 14px 12px 32px; }
+        .topbar { align-items: flex-start; }
+        .top-actions { flex-direction: column; align-items: flex-end; }
+        .settings-grid { grid-template-columns: 1fr; gap: 0; }
+        .status-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .device-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        .device-actions { grid-column: 1 / -1; }
+        .control-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        .control-row button { grid-column: 1 / -1; }
+        .scene { grid-template-columns: minmax(0, 1fr) auto; }
+        .scene .scene-action { grid-column: 1 / -1; width: 100%; }
+        .qr-area { align-items: flex-start; }
+        .qr-area img { width: 128px; height: 128px; }
+      }
+      @media (max-width: 390px) {
+        .topbar { flex-wrap: wrap; }
+        .top-actions { flex-direction: row; align-items: center; }
+        .device-form { grid-template-columns: 1fr; }
+        .device-actions { grid-column: auto; }
+        .status-overview { grid-template-columns: 1fr; }
+        .action-parameter { grid-template-columns: 1fr; gap: 2px; }
+      }
+    </style>
+  </head>
+  <body class="maibot-page">
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <img class="brand-mark" src="data:image/jpeg;base64,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" alt="">
+          <div>
+            <h1>Mi Mai</h1>
+            <div class="subhead">米家设备控制台</div>
+          </div>
+        </div>
+        <div class="top-actions">
+          <span class="status-line"><span id="login-dot" class="status-dot"></span><span id="login-status">正在连接…</span></span>
+          <button id="refresh-button" class="maibot-button" type="button" title="刷新设备状态">刷新</button>
+        </div>
+      </header>
+      <main>
+        <section class="maibot-card" aria-labelledby="overview-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="overview-heading">状态一览</h2>
+              <p>这里汇总当前登录、工具、白名单和联动状态。</p>
+            </div>
+          </div>
+          <div id="overview-grid" class="status-overview"></div>
+          <ul id="attention-list" class="attention-list" aria-label="需要注意的配置"></ul>
+        </section>
+
+        <section class="allowlist-section" aria-labelledby="allowlist-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="allowlist-heading">已加入白名单</h2>
+              <p>已授权的设备和场景会在这里独立显示。</p>
+            </div>
+          </div>
+          <div id="allowlist-grid" class="allowlist-grid"></div>
+        </section>
+
+        <section class="maibot-card" aria-labelledby="account-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="account-heading">米家账号</h2>
+              <p id="login-detail">使用米家 App 扫码登录。</p>
+            </div>
+            <div class="toolbar">
+              <button id="login-button" class="maibot-button maibot-button-primary" type="button">扫码登录</button>
+              <button id="logout-button" class="maibot-button maibot-button-danger" type="button">退出登录</button>
+            </div>
+          </div>
+          <div id="qr-area" class="qr-area" hidden>
+            <img id="qr-image" alt="米家登录二维码">
+            <span class="small muted">请在二维码有效期内使用米家 App 扫描。</span>
+          </div>
+          <div id="refresh-message" class="notice" aria-live="polite"></div>
+        </section>
+
+        <section class="maibot-card" aria-labelledby="settings-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="settings-heading">控制权限</h2>
+              <p>自然语言控制默认关闭；设备与场景需分别加入白名单。</p>
+            </div>
+          </div>
+          <fieldset class="settings-fieldset">
+            <legend>对话控制开关</legend>
+            <div class="settings-grid">
+            <div class="setting-row">
+              <div class="setting-label"><strong>设备控制工具</strong><span class="small muted">允许对话控制白名单设备</span></div>
+              <button id="device-tools" class="switch-control" type="button" role="switch" aria-checked="false" aria-label="设备控制工具">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                <span class="switch-state">关闭</span>
+              </button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><strong>场景控制工具</strong><span class="small muted">允许对话启动白名单场景</span></div>
+              <button id="scene-tools" class="switch-control" type="button" role="switch" aria-checked="false" aria-label="场景控制工具">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                <span class="switch-state">关闭</span>
+              </button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><strong>限制控制用户</strong><span class="small muted">仅允许用户白名单中的账号操作</span></div>
+              <button id="user-limit" class="switch-control" type="button" role="switch" aria-checked="true" aria-label="限制控制用户">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                <span class="switch-state">开启</span>
+              </button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><strong>MaiWeave 状态联动</strong><span class="small muted">睡眠或忙碌时暂缓控制请求</span></div>
+              <button id="maiweave-toggle" class="switch-control" type="button" role="switch" aria-checked="false" aria-label="MaiWeave 状态联动">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                <span class="switch-state">关闭</span>
+              </button>
+            </div>
+            </div>
+          </fieldset>
+          <div id="user-allowlist" style="margin-top:18px">
+            <h3>用户白名单</h3>
+            <p class="small muted">仅允许这里列出的账号请求控制操作。</p>
+            <div class="user-form" style="margin-top:10px">
+              <input id="user-identity" class="maibot-input" type="text" autocomplete="off" placeholder="平台:用户ID">
+              <button id="add-user" class="maibot-button" type="button">加入用户白名单</button>
+            </div>
+            <div id="user-list" class="user-list"></div>
+          </div>
+        </section>
+
+        <section class="maibot-card" aria-labelledby="devices-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="devices-heading">设备</h2>
+              <p id="device-count" class="muted">尚未读取设备</p>
+            </div>
+            <button id="refresh-devices" class="maibot-button" type="button">读取设备状态</button>
+          </div>
+          <div id="device-list" class="device-list"><div class="empty">登录后读取设备。</div></div>
+        </section>
+
+        <section class="maibot-card" aria-labelledby="scenes-heading">
+          <div class="section-head">
+            <div>
+              <h2 id="scenes-heading">场景</h2>
+              <p id="scene-count" class="muted">尚未读取场景</p>
+            </div>
+          </div>
+          <div id="scene-list" class="scene-list"><div class="empty">刷新设备后读取场景。</div></div>
+        </section>
+      </main>
+    </div>
+    <div id="privacy-confirm" class="privacy-confirm" role="dialog" aria-modal="true"
+      aria-labelledby="privacy-confirm-title" hidden>
+      <div class="privacy-dialog">
+        <h2 id="privacy-confirm-title">关闭用户白名单限制？</h2>
+        <p>关闭后，任何能够与机器人对话的用户都可以请求控制已加入白名单的米家设备或场景。设备和场景白名单仍然有效。</p>
+        <div class="privacy-dialog-actions">
+          <button id="privacy-cancel" class="maibot-button" type="button">取消</button>
+          <button id="privacy-accept" class="maibot-button maibot-button-danger" type="button">确认关闭</button>
+        </div>
+      </div>
+    </div>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+    <script>
+      const $ = (selector, root = document) => root.querySelector(selector);
+      let dashboard = null;
+      let toastTimer = 0;
+      let queryPending = false;
+      let renderedKey = "";
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[char]);
+      }
+
+      function notify(message, error = false) {
+        const toast = $("#toast");
+        toast.textContent = message || "已完成";
+        toast.style.background = error ? "var(--danger)" : "var(--ink)";
+        toast.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 2800);
+      }
+
+      function formatValue(value) {
+        if (typeof value === "boolean") return value ? "开" : "关";
+        if (value === null || value === undefined) return "—";
+        return String(value);
+      }
+
+      function switchChecked(id) {
+        return $(`#${id}`)?.getAttribute("aria-checked") === "true";
+      }
+
+      function setSwitchState(id, checked) {
+        const control = $(`#${id}`);
+        if (!control) return;
+        const enabled = Boolean(checked);
+        control.setAttribute("aria-checked", String(enabled));
+        const state = $(".switch-state", control);
+        if (state) state.textContent = enabled ? "开启" : "关闭";
+      }
+
+      function inputForProperty(device, property) {
+        const state = (device.states || []).find(item => item.name === property.name);
+        const current = state && "value" in state ? state.value : "";
+        const choices = property.value_list || [];
+        if (choices.length) {
+          return `<select class="property-value maibot-input" aria-label="${escapeHtml(property.description || property.name)}">
+            ${choices.map(item => {
+              const value = JSON.stringify(item.value);
+              return `<option value="${escapeHtml(value)}" ${item.value === current ? "selected" : ""}>${escapeHtml(item.description ?? item.value)}</option>`;
+            }).join("")}
+          </select>`;
+        }
+        if (property.type === "bool") {
+          return `<select class="property-value maibot-input" aria-label="${escapeHtml(property.description || property.name)}">
+            <option value="true" ${current === true ? "selected" : ""}>开</option>
+            <option value="false" ${current === false ? "selected" : ""}>关</option>
+          </select>`;
+        }
+        if (/^(u?int|integer|float|double|number)(8|16|32|64)?$/i.test(property.type || "")) {
+          const range = property.range || [];
+          const min = range.length ? `min="${escapeHtml(range[0])}"` : "";
+          const max = range.length > 1 ? `max="${escapeHtml(range[1])}"` : "";
+          const step = range.length > 2 ? `step="${escapeHtml(range[2])}"` : "";
+          return `<input class="property-value maibot-input" type="number" ${min} ${max} ${step} value="${escapeHtml(current)}" aria-label="${escapeHtml(property.description || property.name)}">`;
+        }
+        return `<input class="property-value maibot-input" type="text" value="${escapeHtml(current)}" aria-label="${escapeHtml(property.description || property.name)}">`;
+      }
+
+      function inputForActionParameter(parameter, index) {
+        const label = escapeHtml(parameter.description || parameter.name || `参数 ${index + 1}`);
+        const choices = parameter.value_list || [];
+        if (choices.length) {
+          return `<select class="action-parameter-value maibot-input" data-index="${index}" data-type="${escapeHtml(parameter.type || "")}" aria-label="${label}">
+            ${choices.map(item => {
+              const value = JSON.stringify(item.value);
+              return `<option value="${escapeHtml(value)}">${escapeHtml(item.description ?? item.value)}</option>`;
+            }).join("")}
+          </select>`;
+        }
+        if (parameter.type === "bool") {
+          return `<select class="action-parameter-value maibot-input" data-index="${index}" data-type="bool" aria-label="${label}">
+            <option value="true">开</option>
+            <option value="false">关</option>
+          </select>`;
+        }
+        if (/^(u?int|integer|float|double|number)(8|16|32|64)?$/i.test(parameter.type || "")) {
+          const range = parameter.range || [];
+          const min = range.length ? `min="${escapeHtml(range[0])}"` : "";
+          const max = range.length > 1 ? `max="${escapeHtml(range[1])}"` : "";
+          const step = range.length > 2 ? `step="${escapeHtml(range[2])}"` : "";
+          return `<input class="action-parameter-value maibot-input" data-index="${index}" data-type="${escapeHtml(parameter.type || "")}" type="number" ${min} ${max} ${step} aria-label="${label}">`;
+        }
+        return `<input class="action-parameter-value maibot-input" data-index="${index}" data-type="${escapeHtml(parameter.type || "")}" type="text" aria-label="${label}" placeholder="填写参数">`;
+      }
+
+      function actionParametersMarkup(action) {
+        const inputs = action?.inputs || [];
+        if (!inputs.length) return `<span class="small muted">此动作不需要参数</span>`;
+        return inputs.map((parameter, index) => `
+          <div class="action-parameter">
+            <label>${escapeHtml(parameter.description || parameter.name || `参数 ${index + 1}`)}</label>
+            ${inputForActionParameter(parameter, index)}
+          </div>`).join("");
+      }
+
+      function readActionArguments(card) {
+        return [...card.querySelectorAll(".action-parameter-value")].map(input => {
+          const type = String(input.dataset.type || "").toLowerCase();
+          const value = input.value;
+          if (type === "bool") return value === "true";
+          if (/^(u?int|integer|float|double|number)/.test(type)) return Number(value);
+          try {
+            return JSON.parse(value);
+          } catch {
+            return value;
+          }
+        });
+      }
+
+      function renderOverview(data) {
+        const login = data.login || {};
+        const settings = data.settings || {};
+        const devices = data.devices || [];
+        const scenes = data.scenes || [];
+        const allowedDevices = devices.filter(item => item.allowed);
+        const allowedScenes = scenes.filter(item => item.allowed);
+        const entries = [
+          ["米家账号", login.connected ? "已连接" : (login.pending ? "等待扫码" : "未登录"), login.connected ? "success" : "warning"],
+          ["只读查询工具", "设备列表与状态已开启", "success"],
+          ["设备控制工具", settings.control_tools_enabled ? "已开启" : "已关闭", settings.control_tools_enabled ? "warning" : "success"],
+          ["场景控制工具", settings.scene_tools_enabled ? "已开启" : "已关闭", settings.scene_tools_enabled ? "warning" : "success"],
+          ["用户白名单", settings.only_whitelisted_users ? "已限制" : "未限制", settings.only_whitelisted_users ? "success" : "warning"],
+          ["MaiWeave 联动", settings.maiweave_enabled ? "已开启" : "已关闭", settings.maiweave_enabled ? "success" : "neutral"],
+          ["设备白名单", `${allowedDevices.length} / ${devices.length}`, allowedDevices.length ? "success" : "neutral"],
+          ["场景白名单", `${allowedScenes.length} / ${scenes.length}`, allowedScenes.length ? "success" : "neutral"]
+        ];
+        $("#overview-grid").innerHTML = entries.map(([label, value, tone]) =>
+          `<div class="status-item ${tone}"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`
+        ).join("");
+
+        const attention = [];
+        if (!login.connected) attention.push("请先登录米家账号并读取设备。");
+        if (settings.control_tools_enabled && !allowedDevices.length) attention.push("设备控制工具已开启，但还没有设备加入控制白名单。");
+        if (settings.scene_tools_enabled && !allowedScenes.length) attention.push("场景控制工具已开启，但还没有场景加入控制白名单。");
+        if (!settings.only_whitelisted_users) attention.push("用户白名单限制已关闭，所有聊天用户都可以请求控制已授权设备和场景。");
+        if (settings.maiweave_enabled) attention.push("MaiWeave 联动已开启，忙碌或睡眠状态下的控制请求会被暂缓。");
+        $("#attention-list").innerHTML = attention.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+      }
+
+      function deviceMarkup(device) {
+        const allowed = Boolean(device.allowed);
+        const stateMarkup = (device.states || []).filter(item => "value" in item).map(item =>
+          `<span class="state-item">${escapeHtml(item.description || item.name)}：${escapeHtml(formatValue(item.value))}</span>`
+        ).join("");
+        const writable = (device.properties || []).filter(item => item.writable);
+        const actions = device.actions || [];
+        const properties = writable.map(item =>
+          `<option value="${escapeHtml(item.name)}">${escapeHtml(item.description || item.name)}</option>`
+        ).join("");
+        const controlMarkup = allowed && writable.length ? `
+          <div class="control-row">
+            <select class="property-name maibot-input" aria-label="可写属性">${properties}</select>
+            <div class="property-editor">${inputForProperty(device, writable[0])}</div>
+            <button class="maibot-button maibot-button-primary send-property" type="button" data-did="${escapeHtml(device.did)}">发送操作</button>
+          </div>` : "";
+        const actionMarkup = allowed && actions.length ? `
+          <div class="control-row action-control-row">
+            <select class="action-name maibot-input" aria-label="设备动作">
+              ${actions.map(item => `<option value="${escapeHtml(item.name)}">${escapeHtml(item.description || item.name)}</option>`).join("")}
+            </select>
+            <div class="action-parameters">${actionParametersMarkup(actions[0])}</div>
+            <button class="maibot-button maibot-button-primary send-action" type="button" data-did="${escapeHtml(device.did)}">执行动作</button>
+          </div>
+          <span class="action-hint">${escapeHtml(actionHint(actions[0]))}</span>` : "";
+        return `<article class="device ${allowed ? "is-allowed" : ""}">
+          <div class="device-head">
+            <div class="device-name">
+              <h3>${escapeHtml(device.alias || device.name)}</h3>
+              <div class="device-meta">${escapeHtml(device.model || device.did)}${device.alias ? ` · ${escapeHtml(device.name)}` : ""}</div>
+            </div>
+            <span class="allow-state ${allowed ? "allowed" : ""}">${allowed ? "已加入控制白名单" : "未加入白名单"}</span>
+          </div>
+          <div class="device-form">
+            <input class="device-alias maibot-input" type="text" value="${escapeHtml(device.alias)}" placeholder="设备别名" aria-label="设备别名">
+            <select class="device-category maibot-input" aria-label="设备类别">
+              <option value="">选择类别</option>
+              ${(dashboard.categories || []).map(category =>
+                `<option value="${escapeHtml(category)}" ${device.category === category ? "selected" : ""}>${escapeHtml(category)}</option>`
+              ).join("")}
+            </select>
+            <div class="device-actions">
+              <button class="maibot-button save-device" type="button"
+                data-did="${escapeHtml(device.did)}" data-allowed="${allowed}">保存配置</button>
+              <button class="maibot-button ${allowed ? "maibot-button-danger" : "maibot-button-primary"} toggle-device" type="button"
+                data-did="${escapeHtml(device.did)}" data-allowed="${!allowed}">
+                ${allowed ? "移出白名单" : "加入设备白名单"}
+              </button>
+            </div>
+          </div>
+          <div class="state-line">${stateMarkup || `<span class="small muted">${device.status_error ? "状态读取失败" : "暂无可读状态"}</span>`}</div>
+          ${controlMarkup}
+          ${actionMarkup}
+        </article>`;
+      }
+
+      function actionHint(action) {
+        if (!action) return "";
+        const names = (action.inputs || []).map(item =>
+          `${item.description || item.name || "参数"} (${item.type || "未知类型"})`
+        );
+        const details = names.length ? `参数：${names.join("、")}。` : "此动作不需要参数。";
+        return [action.description, details].filter(Boolean).join(" ");
+      }
+
+      function allowlistDeviceMarkup(device, index) {
+        const stateItems = (device.states || []).filter(item => "value" in item).slice(0, 2);
+        const stateSummary = stateItems.length
+          ? stateItems.map(item =>
+            `${item.description || item.name}：${formatValue(item.value)}`
+          ).join("；")
+          : (device.status_error ? "状态读取失败" : "暂无可读状态");
+        const title = device.alias || device.name;
+        const meta = [device.category, device.model || device.did].filter(Boolean).join(" · ");
+        return `<article class="allowlist-card device-card" style="animation-delay:${index * 35}ms">
+          <div>
+            <span class="allowlist-kind">设备</span>
+            <h3>${escapeHtml(title)}</h3>
+            <div class="allowlist-meta">${escapeHtml(meta || "未分类设备")}</div>
+            <div class="allowlist-meta">${escapeHtml(stateSummary)}</div>
+          </div>
+          <div class="allowlist-actions">
+            <button class="maibot-button allowlist-remove-device" type="button"
+              data-did="${escapeHtml(device.did)}">移出白名单</button>
+          </div>
+        </article>`;
+      }
+
+      function allowlistSceneMarkup(scene, index) {
+        return `<article class="allowlist-card scene-card" style="animation-delay:${index * 35}ms">
+          <div>
+            <span class="allowlist-kind">场景</span>
+            <h3>${escapeHtml(scene.name)}</h3>
+            <div class="allowlist-meta">家庭：${escapeHtml(scene.home_id || "未知")}</div>
+          </div>
+          <div class="allowlist-actions">
+            <button class="maibot-button maibot-button-primary allowlist-run-scene" type="button"
+              data-key="${escapeHtml(scene.key)}">启动场景</button>
+            <button class="maibot-button allowlist-remove-scene" type="button"
+              data-key="${escapeHtml(scene.key)}">移出白名单</button>
+          </div>
+        </article>`;
+      }
+
+      function renderAllowlist(data) {
+        const allowedDevices = (data.devices || []).filter(item => item.allowed);
+        const allowedScenes = (data.scenes || []).filter(item => item.allowed);
+        const cards = [
+          ...allowedDevices.map((device, index) => allowlistDeviceMarkup(device, index)),
+          ...allowedScenes.map((scene, index) => allowlistSceneMarkup(scene, allowedDevices.length + index))
+        ];
+        $("#allowlist-grid").innerHTML = cards.length
+          ? cards.join("")
+          : `<div class="allowlist-empty">还没有加入白名单的设备或场景。</div>`;
+      }
+
+      function dataKey(data) {
+        return JSON.stringify({
+          login: data.login,
+          settings: data.settings,
+          devices: data.devices,
+          scenes: data.scenes,
+          refresh: data.refresh
+        });
+      }
+
+      function updateLiveChrome(data) {
+        const login = data.login || {};
+        $("#login-status").textContent = login.status || "未登录";
+        const loggedIn = Boolean(login.connected);
+        $("#login-dot").className = `status-dot ${login.pending ? "pending" : (loggedIn ? "online" : "")}`;
+        $("#login-detail").textContent = login.pending
+          ? "等待米家 App 确认扫码。"
+          : (login.status || "使用米家 App 扫码登录。");
+        $("#login-button").hidden = loggedIn;
+        $("#login-button").textContent = login.qr_data_url ? "刷新二维码" : "扫码登录";
+        $("#login-button").disabled = Boolean(login.pending && !login.qr_data_url);
+        $("#logout-button").hidden = !loggedIn;
+        const qrArea = $("#qr-area");
+        const qrImage = $("#qr-image");
+        if (login.qr_data_url) {
+          if (qrImage.src !== login.qr_data_url) qrImage.src = login.qr_data_url;
+          qrArea.hidden = false;
+        } else {
+          qrImage.removeAttribute("src");
+          qrArea.hidden = true;
+        }
+        $("#refresh-button").disabled = Boolean(data.refresh?.refreshing);
+        $("#refresh-devices").disabled = Boolean(data.refresh?.refreshing);
+        $("#refresh-message").textContent = data.refresh?.message || "";
+        setSwitchState("device-tools", data.settings?.control_tools_enabled);
+        setSwitchState("scene-tools", data.settings?.scene_tools_enabled);
+        setSwitchState("user-limit", data.settings?.only_whitelisted_users);
+        setSwitchState("maiweave-toggle", data.settings?.maiweave_enabled);
+        $("#user-allowlist").hidden = !Boolean(data.settings?.only_whitelisted_users);
+        renderOverview(data);
+      }
+
+      function render(data) {
+        dashboard = data;
+        updateLiveChrome(data);
+
+        const users = data.settings?.allowed_users || [];
+        $("#user-list").innerHTML = users.length ? users.map(identity =>
+          `<span class="user-item">${escapeHtml(identity)}<button class="maibot-button remove-user" type="button" data-identity="${escapeHtml(identity)}" title="移出白名单" aria-label="移出 ${escapeHtml(identity)}">移除</button></span>`
+        ).join("") : `<span class="small muted">暂无用户白名单</span>`;
+
+        const devices = data.devices || [];
+        renderAllowlist(data);
+        $("#device-count").textContent = `${devices.length} 台设备`;
+        $("#device-list").innerHTML = devices.length
+          ? devices.map(deviceMarkup).join("")
+          : `<div class="empty">${escapeHtml(data.refresh?.message || "暂无设备，请先登录并读取。")}</div>`;
+
+        const scenes = data.scenes || [];
+        $("#scene-count").textContent = `${scenes.length} 个场景`;
+        $("#scene-list").innerHTML = scenes.length ? scenes.map(scene => `
+          <article class="scene">
+            <div>
+              <div class="scene-name">${escapeHtml(scene.name)}</div>
+              <div class="scene-sub">${escapeHtml(scene.home_id)}</div>
+            </div>
+            <span class="badge ${scene.allowed ? "allowed" : ""}">${scene.allowed ? "已加入白名单" : "未加入白名单"}</span>
+            <div class="toolbar scene-action">
+              <button class="maibot-button toggle-scene" type="button" data-key="${escapeHtml(scene.key)}" data-allowed="${!scene.allowed}">
+                ${scene.allowed ? "移出白名单" : "加入白名单"}
+              </button>
+              ${scene.allowed ? `<button class="maibot-button maibot-button-primary run-scene" type="button" data-key="${escapeHtml(scene.key)}">启动场景</button>` : ""}
+            </div>
+          </article>`).join("") : `<div class="empty">暂无场景。</div>`;
+
+        bindControls();
+        renderedKey = dataKey(data);
+      }
+
+      async function loadDashboard(showError = false, forceRender = false, preserveView = false) {
+        if (queryPending || typeof maibot === "undefined") return;
+        queryPending = true;
+        try {
+          const data = await maibot.query("dashboard");
+          const nextKey = dataKey(data);
+          if (preserveView || (document.activeElement?.matches("input, select, textarea") && dashboard && !forceRender)) {
+            dashboard = data;
+            updateLiveChrome(data);
+          } else if (forceRender || !dashboard || nextKey !== renderedKey) {
+            render(data);
+          } else {
+            dashboard = data;
+            updateLiveChrome(data);
+          }
+        } catch (error) {
+          if (showError) notify("页面状态暂时无法读取", true);
+        } finally {
+          queryPending = false;
+        }
+      }
+
+      async function perform(action, parameters = {}, successText = "已保存") {
+        try {
+          const result = await maibot.action(action, parameters);
+          notify(result?.message || successText, result?.ok === false);
+          await loadDashboard(true, false, true);
+        } catch (error) {
+          notify("操作没有完成，请稍后重试", true);
+          await loadDashboard(false, false, true);
+        }
+      }
+
+      function bindControls() {
+        document.querySelectorAll(".save-device, .toggle-device").forEach(button => {
+          button.addEventListener("click", () => {
+            const card = button.closest(".device");
+            perform("save_device", {
+              did: button.dataset.did,
+              alias: $(".device-alias", card).value,
+              category: $(".device-category", card).value,
+              allowed: button.dataset.allowed === "true"
+            }, "设备配置已保存");
+          });
+        });
+
+        document.querySelectorAll(".property-name").forEach(select => {
+          select.addEventListener("change", () => {
+            const card = select.closest(".device");
+            const device = dashboard.devices.find(item => item.did === card.querySelector(".send-property").dataset.did);
+            const prop = device.properties.find(item => item.name === select.value);
+            card.querySelector(".property-editor").innerHTML = inputForProperty(device, prop);
+          });
+        });
+
+        document.querySelectorAll(".send-property").forEach(button => {
+          button.addEventListener("click", () => {
+            const card = button.closest(".device");
+            const propertyName = $(".property-name", card).value;
+            const propertyValue = $(".property-value", card).value;
+            const selected = dashboard.devices.find(item => item.did === button.dataset.did);
+            const property = selected.properties.find(item => item.name === propertyName);
+            let rawValue = propertyValue;
+            if ((property.value_list || []).length) {
+              rawValue = propertyValue;
+            } else if (property.type === "bool") {
+              rawValue = propertyValue;
+            }
+            perform("control_property", {
+              did: button.dataset.did,
+              property_name: propertyName,
+              value: rawValue
+            }, "设备操作已发送");
+          });
+        });
+
+        document.querySelectorAll(".action-name").forEach(select => {
+          select.addEventListener("change", () => {
+            const card = select.closest(".device");
+            const device = dashboard.devices.find(item => item.did === card.querySelector(".send-action").dataset.did);
+            const action = device.actions.find(item => item.name === select.value);
+            card.querySelector(".action-parameters").innerHTML = actionParametersMarkup(action);
+            card.querySelector(".action-hint").textContent = actionHint(action);
+          });
+        });
+
+        document.querySelectorAll(".send-action").forEach(button => {
+          button.addEventListener("click", () => {
+            const card = button.closest(".device");
+            const actionName = $(".action-name", card).value;
+            perform("run_device_action", {
+              did: button.dataset.did,
+              action_name: actionName,
+              arguments: JSON.stringify(readActionArguments(card))
+            }, "设备动作已提交");
+          });
+        });
+
+        document.querySelectorAll(".toggle-scene").forEach(button => {
+          button.addEventListener("click", () => perform("set_scene_allowed", {
+            key: button.dataset.key,
+            allowed: button.dataset.allowed === "true"
+          }, "场景白名单已更新"));
+        });
+        document.querySelectorAll(".allowlist-remove-device").forEach(button => {
+          button.addEventListener("click", () => {
+            const device = (dashboard?.devices || []).find(item => item.did === button.dataset.did);
+            if (!device) {
+              notify("设备已不在当前列表，请先刷新", true);
+              return;
+            }
+            perform("save_device", {
+              did: device.did,
+              alias: device.alias || "",
+              category: device.category || "",
+              allowed: false
+            }, "设备已移出白名单");
+          });
+        });
+        document.querySelectorAll(".allowlist-remove-scene").forEach(button => {
+          button.addEventListener("click", () => perform("set_scene_allowed", {
+            key: button.dataset.key,
+            allowed: false
+          }, "场景已移出白名单"));
+        });
+        document.querySelectorAll(".allowlist-run-scene").forEach(button => {
+          button.addEventListener("click", () => perform("run_scene", {
+            key: button.dataset.key
+          }, "场景已启动"));
+        });
+        document.querySelectorAll(".run-scene").forEach(button => {
+          button.addEventListener("click", () => perform("run_scene", {
+            key: button.dataset.key
+          }, "场景已启动"));
+        });
+        document.querySelectorAll(".remove-user").forEach(button => {
+          button.addEventListener("click", () => perform("remove_user", {
+            identity: button.dataset.identity
+          }, "用户已移出白名单"));
+        });
+      }
+
+      $("#login-button").addEventListener("click", () => perform("start_login", {}, "正在准备二维码"));
+      $("#logout-button").addEventListener("click", () => perform("logout", {}, "已退出登录"));
+      $("#refresh-button").addEventListener("click", () => perform("refresh_devices", {}, "正在刷新设备"));
+      $("#refresh-devices").addEventListener("click", () => perform("refresh_devices", {}, "正在刷新设备"));
+      function updateControlTools() {
+        const deviceEnabled = switchChecked("device-tools");
+        const sceneEnabled = switchChecked("scene-tools");
+        const action = deviceEnabled || sceneEnabled ? "enable_controls" : "set_controls";
+        return perform(action, {
+          device_enabled: deviceEnabled,
+          scene_enabled: sceneEnabled
+        }, "控制设置已更新");
+      }
+      $("#device-tools").addEventListener("click", () => {
+        setSwitchState("device-tools", !switchChecked("device-tools"));
+        updateControlTools();
+      });
+      $("#scene-tools").addEventListener("click", () => {
+        setSwitchState("scene-tools", !switchChecked("scene-tools"));
+        updateControlTools();
+      });
+      $("#maiweave-toggle").addEventListener("click", () => {
+        const enabled = !switchChecked("maiweave-toggle");
+        setSwitchState("maiweave-toggle", enabled);
+        perform("set_maiweave", { enabled }, "联动设置已更新");
+      });
+      $("#user-limit").addEventListener("click", () => {
+        if (switchChecked("user-limit")) {
+          $("#privacy-confirm").hidden = false;
+          $("#privacy-accept").focus();
+          return;
+        }
+        setSwitchState("user-limit", true);
+      });
+      $("#privacy-cancel").addEventListener("click", () => {
+        $("#privacy-confirm").hidden = true;
+        setSwitchState("user-limit", true);
+        $("#user-limit").focus();
+      });
+      $("#privacy-accept").addEventListener("click", () => {
+        $("#privacy-confirm").hidden = true;
+        setSwitchState("user-limit", false);
+        perform("set_privacy", {
+          only_whitelisted_users: false
+        }, "用户控制范围已更新");
+      });
+      $("#add-user").addEventListener("click", async () => {
+        const input = $("#user-identity");
+        if (!input.value.trim()) {
+          notify("请填写平台与用户 ID", true);
+          return;
+        }
+        await perform("add_user", { identity: input.value.trim() }, "用户已加入白名单");
+        input.value = "";
+      });
+
+      async function start() {
+        try {
+          if (typeof maibot !== "undefined" && maibot.ready) await maibot.ready;
+          await loadDashboard(true);
+        } catch (error) {
+          notify("页面暂时无法连接", true);
+        }
+        setInterval(() => {
+          if (!document.hidden) loadDashboard();
+        }, 2200);
+      }
+
+      start();
+    </script>
+  </body>
+</html>
