@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-GPL--3.0--or--later-2f7d32?style=flat-square" alt="License">
   <img src="https://img.shields.io/github/last-commit/hedgehogovo/Mi-Mai?style=flat-square&label=last%20commit" alt="Last commit">
   <img src="https://img.shields.io/badge/MaiBot-%E2%89%A51.4.5-4b8bbe?style=flat-square" alt="MaiBot compatibility">
-  <img src="https://img.shields.io/badge/latest%20plugin%20version-1.0.0-ef6c00?style=flat-square" alt="Latest plugin version 1.0.0">
+  <img src="https://img.shields.io/badge/latest%20plugin%20version-1.0.1-ef6c00?style=flat-square" alt="Latest plugin version 1.0.1">
 </p>
 
 <h1 align="center">Mi Mai - 让麦麦控制你的米家设备</h1>
@@ -30,6 +30,12 @@
 - 用户白名单默认开启；关闭后会先显示风险确认，设备和场景白名单仍然有效。
 - 可选联动 MaiWeave：明确处于忙碌或睡眠状态时暂缓控制请求。
 - 插件失败、权限不足或工具关闭时，面向对话保持自然口吻，不把内部错误直接暴露给用户。
+
+## 更新日志
+
+### 1.0.1
+
+- 在插件 manifest 中声明 `custom_pages`，使侧栏自定义页面能力与 `webui.json` 保持一致。
 
 ## 安装
 

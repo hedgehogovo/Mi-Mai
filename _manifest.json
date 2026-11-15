@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "id": "orxilv.mi_mai",
   "name": "Mi Mai",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "通过米家账号查看设备状态、管理设备白名单并安全控制设备与场景。",
   "author": {
     "name": "Orxil.V",
@@ -40,7 +40,8 @@
     "api.call",
     "send.text",
     "component.enable",
-    "component.disable"
+    "component.disable",
+    "custom_pages"
   ],
   "i18n": {
     "default_locale": "zh-CN",
