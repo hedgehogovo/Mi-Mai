@@ -85,6 +85,7 @@ node -e "const fs=require('fs');const h=fs.readFileSync('webui/index.html','utf8
 ```text
 .
 ├── _manifest.json       # 插件元信息
+├── LICENSE              # GPL-3.0-or-later 许可文本
 ├── plugin.py            # SDK 入口与工具、指令、事件
 ├── core.py              # 米家 API、权限和状态逻辑
 ├── webui.json           # 侧栏页面与 API 声明
@@ -97,7 +98,7 @@ node -e "const fs=require('fs');const h=fs.readFileSync('webui/index.html','utf8
 
 作者：**Orxil.V**
 
-本项目使用 `GPL-3.0-or-later` 许可，许可声明见 `_manifest.json`。
+本项目使用 `GPL-3.0-or-later` 许可，详见 [LICENSE](LICENSE) 和 [_manifest.json](_manifest.json)。
 
 ## Star 趋势
 
