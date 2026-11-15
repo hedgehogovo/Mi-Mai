@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="plugins/mi_mai/assets/logo.png" width="160" alt="Mi Mai Logo">
+  <img src="assets/logo.png" width="160" alt="Mi Mai Logo">
 </p>
 
 <p align="center">
@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/license-GPL--3.0--or--later-2f7d32?style=flat-square" alt="License">
   <img src="https://img.shields.io/github/last-commit/hedgehogovo/Mi-Mai?style=flat-square&label=last%20commit" alt="Last commit">
   <img src="https://img.shields.io/badge/MaiBot-%E2%89%A51.4.5-4b8bbe?style=flat-square" alt="MaiBot compatibility">
+  <img src="https://img.shields.io/badge/latest%20plugin%20version-1.0.0-ef6c00?style=flat-square" alt="Latest plugin version 1.0.0">
 </p>
 
 <h1 align="center">Mi Mai - 让麦麦控制你的米家设备</h1>
@@ -32,10 +33,10 @@
 
 ## 安装
 
-将 `plugins/mi_mai` 放入 MaiBot 的 `plugins/<plugin-name>/` 目录，并安装米家 API 依赖：
+本仓库根目录就是插件目录。将本仓库内容直接放入 MaiBot 的 `plugins/<plugin-name>/` 目录，并安装米家 API 依赖：
 
 ```powershell
-python -m pip install -r plugins/mi_mai/requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 重启 MaiBot 后，在侧栏打开 **Mi Mai**。首次使用时点击“扫码登录”获取二维码；登录后点击“读取设备状态”，为需要控制的设备填写别名和类别，再加入白名单。场景需要单独加入白名单。
@@ -72,9 +73,9 @@ python -m pip install -r plugins/mi_mai/requirements.txt
 在仓库根目录运行：
 
 ```powershell
-python -m unittest discover -s plugins/mi_mai/tests -v
-python -m compileall -q plugins/mi_mai
-node -e "const fs=require('fs');const h=fs.readFileSync('plugins/mi_mai/webui/index.html','utf8');const s=h.indexOf('<script>'),e=h.indexOf('</script>',s);new Function(h.slice(s+8,e));console.log('webui script syntax ok')"
+python -m unittest discover -s tests -v
+python -m compileall -q .
+node -e "const fs=require('fs');const h=fs.readFileSync('webui/index.html','utf8');const s=h.indexOf('<script>'),e=h.indexOf('</script>',s);new Function(h.slice(s+8,e));console.log('webui script syntax ok')"
 ```
 
 真实扫码和米家云端控制需要在已安装 MaiBot 的实例中验收；页面脚本还应通过项目已有的 WebUI 测试流程检查。
@@ -82,7 +83,7 @@ node -e "const fs=require('fs');const h=fs.readFileSync('plugins/mi_mai/webui/in
 ## 目录
 
 ```text
-plugins/mi_mai/
+.
 ├── _manifest.json       # 插件元信息
 ├── plugin.py            # SDK 入口与工具、指令、事件
 ├── core.py              # 米家 API、权限和状态逻辑
@@ -96,4 +97,12 @@ plugins/mi_mai/
 
 作者：**Orxil.V**
 
-本项目使用 `GPL-3.0-or-later` 许可，许可声明见 `plugins/mi_mai/_manifest.json`。
+本项目使用 `GPL-3.0-or-later` 许可，许可声明见 `_manifest.json`。
+
+## Star 趋势
+
+<p align="center">
+  <a href="https://star-history.com/#hedgehogovo/Mi-Mai&Date">
+    <img src="https://api.star-history.com/svg?repos=hedgehogovo/Mi-Mai&type=Date" alt="Mi Mai Star History Chart">
+  </a>
+</p>
